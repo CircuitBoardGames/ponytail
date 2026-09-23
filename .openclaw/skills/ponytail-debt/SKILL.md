@@ -14,7 +14,7 @@ can't quietly become permanent.
 Grep the repo for comment markers, skipping `node_modules`, `.git`, and build
 output:
 
-`grep -rnE '(#|//) ?ponytail:' .`  (add other comment prefixes if your stack uses them)
+`git grep -nE '(#|//) ?ponytail:'`  (add other comment prefixes if your stack uses them). Use `git grep`, not a recursive `grep -r`: some agent shells wrap `grep` (Claude Code runs ugrep with `--ignore-files -I`), and a recursive walk there silently skips gitignored and binary-looking files while still exiting 0. `git grep` covers exactly the tracked files, the same way everywhere. Outside a git repo, use `command grep -rnE`.
 
 Each hit is one ledger row. The comment prefix keeps prose that merely mentions
 the convention out of the ledger.

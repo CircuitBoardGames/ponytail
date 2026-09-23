@@ -1,0 +1,6 @@
+{
+  "true_upstream": "https://github.com/DietrichGebert/ponytail",
+  "true_upstream_branch": "main",
+  "last_synced_upstream_sha": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+  "note": "Provenance marker for the CircuitBoardGames/ClaudeCode maintainer agent's P2 vendor-sync drift check. last_synced_upstream_sha is this fork's merge-base with true_upstream (v4.10.0); advance it in each true-upstream->fork sync PR. Seeded 2026-09-23 at fork creation. The fork's divergence: ponytail-debt harvests markers with `git grep` instead of a recursive `grep -r` (a wrapped grep, such as Claude Code's ugrep --ignore-files, silently skips files), in skills/, commands/, .opencode/ and the generated .openclaw/; and .forgejo/workflows/test.yml, the forge gate. Upstream syncs merge around them."
+}
