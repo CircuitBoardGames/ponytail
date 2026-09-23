@@ -1,12 +1,13 @@
 name: Test
 
-# Starting-point test gate for a Node/Next.js + Prisma target repo.
-# Adapt the install / codegen / test steps to the target's actual stack.
-# Verify the suite passes locally BEFORE committing this — never add a red gate.
+# The forge gate for this fork (CircuitBoardGames/ponytail). It runs what upstream's own
+# .github/workflows/test.yml runs, adapted to the forge's host-mode runner: Python deps go into
+# the job's own venv, never the shared runner home. Upstream's workflow stays untouched so syncs
+# from true upstream stay clean; a present .forgejo/workflows is read INSTEAD of .github/.
 
 on:
   pull_request:
-  # No `push:` -- CI is preventative only, nothing runs after a merge (operator, 2026-09-15).
+  # No `push:` -- CI is preventative only, nothing runs after a merge.
 
 concurrency:
   group: test-${{ github.ref }}
@@ -22,18 +23,22 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: '22'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Python deps for the correctness checks (job venv)
+        run: |
+          python3 -m venv .ci-venv
+          .ci-venv/bin/pip install -q pandas
+          echo "$PWD/.ci-venv/bin" >> "$GITHUB_PATH"
 
-      # Drop this step if the target has no codegen (Prisma / GraphQL / protobuf).
-      - name: Generate Prisma client
-        run: npx prisma generate
+      - name: Install MCP deps
+        run: npm install --prefix ponytail-mcp
 
-      - name: Lint
-        run: npm run lint
+      - name: Check rule copies
+        run: node scripts/check-rule-copies.js
 
-      - name: Test
+      - name: Check version consistency
+        run: node scripts/check-versions.js
+
+      - name: Run tests
         run: npm test
