@@ -39,7 +39,7 @@ right one — once you actually know what the change has to touch.
 edit, grep every caller of the function you're about to touch. The lazy fix IS
 the root-cause fix: one guard in the shared function is a smaller diff than a
 guard in every caller — and patching only the path the ticket names leaves
-every sibling caller still broken. Fix it once, where all callers route through.
+every sibling caller still broken. Fix it once, where all callers route through. Unless a caller is deliberately different: read each caller and say what it is for before changing the shared function.
 
 ## Rules
 
