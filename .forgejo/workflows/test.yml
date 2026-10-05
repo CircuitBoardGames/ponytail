@@ -19,6 +19,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: No conflict markers
+        run: |
+          rc=0; git grep -nE '^(<<<<<<<|>>>>>>>)( |$)' || rc=$?
+          [ "$rc" -eq 1 ] || { echo "conflict markers above, or git grep failed (rc=$rc)"; exit 1; }
 
       - name: Set up Node
         uses: actions/setup-node@v4
