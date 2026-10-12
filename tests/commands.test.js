@@ -57,10 +57,17 @@ const debtSamples = [
   ['/* ponytail: block marker, closed here */', true],
   ['/*ponytail: block marker, no space */', true],
   ['/* ponytail: block opener, closed some lines below', true],
+  ['    ponytail: docstring marker, indented', true],
+  ['ponytail: marker opening a prose block', true],
+  [' *  ponytail: JSDoc marker', true],
+  ['# one comment sentence. ponytail: marker mid-line', true],
   ['prose that merely mentions ponytail: markers stays out of the ledger', false],
+  ['see .claude/hooks/ponytail: a path, not a marker', false],
+  ['https://example.com/ponytail: a URL, not a marker', false],
+  ['obj.ponytail: a dotted key, not a marker', false],
 ];
 
-test('every ponytail-debt copy greps #, // and /* markers but not prose', (t) => {
+test('every ponytail-debt copy greps comment, docstring and mid-line markers but not prose or paths', (t) => {
   const input = debtSamples.map(([line]) => line).join('\n') + '\n';
   const expected = debtSamples.flatMap(([line, hit], i) => (hit ? [`${i + 1}:${line}`] : []));
 

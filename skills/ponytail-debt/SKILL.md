@@ -15,12 +15,13 @@ can't quietly become permanent.
 Grep the repo for comment markers, skipping `node_modules`, `.git`, and build
 output:
 
-`grep -rnE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build '(#|//|/[*]) ?(shortcut|ponytail):' .`  (add other comment prefixes if your stack uses them). Inside a git repo, run `git grep -nE '(#|//|/[*]) ?(shortcut|ponytail):'` instead: some agent shells wrap `grep` (Claude Code runs ugrep with `--ignore-files -I`), and a recursive walk there silently skips gitignored and binary-looking files while still exiting 0. `git grep` covers exactly the tracked files, the same way everywhere.
+`grep -rnE --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=build '(^[[:space:]]*([*][[:space:]]*)?|[.!?][[:space:]]+|(#|//|/[*]) ?)(shortcut|ponytail):' .`  (add other comment prefixes if your stack uses them). Inside a git repo, run `git grep -nE '(^[[:space:]]*([*][[:space:]]*)?|[.!?][[:space:]]+|(#|//|/[*]) ?)(shortcut|ponytail):'` instead: some agent shells wrap `grep` (Claude Code runs ugrep with `--ignore-files -I`), and a recursive walk there silently skips gitignored and binary-looking files while still exiting 0. `git grep` covers exactly the tracked files, the same way everywhere.
 
 If the user names their own marker word (`/ponytail-debt TODO`), grep for that word instead.
 
-Each hit is one ledger row. The comment prefix keeps prose that merely mentions
-the convention out of the ledger. Skip hits that are not a deferral, like a note
+Each hit is one ledger row. The pattern takes a marker after a comment prefix, at
+the start of a line (docstrings, JSDoc, prose blocks) or after a sentence ends,
+which keeps prose that merely mentions the convention, and paths, out of the ledger. Skip hits that are not a deferral, like a note
 about a keyboard shortcut.
 
 ## Output
