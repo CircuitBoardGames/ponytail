@@ -3,10 +3,20 @@
 
 const fs = require('fs');
 const path = require('path');
-const { DEFAULT_MODE, normalizeMode, normalizePersistedMode } = require('./ponytail-config');
+const { DEFAULT_MODE, getClaudeDir, normalizeMode, normalizePersistedMode } = require('./ponytail-config');
 
 const INDEPENDENT_MODES = new Set(['review']);
-const SKILL_PATH = path.join(__dirname, '..', 'skills', 'ponytail', 'SKILL.md');
+
+// The plugin keeps skills/ beside hooks/. A copied-hook install (hooks in
+// <project>/.claude/hooks/ponytail/) has no sibling skills/, so fall back to the
+// installed skill: user (~/.claude, or CLAUDE_CONFIG_DIR), then project.
+function readSkill() {
+  const candidates = [path.join(__dirname, '..'), getClaudeDir()];
+  if (process.env.CLAUDE_PROJECT_DIR) candidates.push(path.join(process.env.CLAUDE_PROJECT_DIR, '.claude'));
+  const file = candidates.map((dir) => path.join(dir, 'skills', 'ponytail', 'SKILL.md')).find((p) => fs.existsSync(p));
+  if (!file) throw new Error('ponytail SKILL.md not found');
+  return fs.readFileSync(file, 'utf8');
+}
 
 function filterSkillBodyForMode(body, mode) {
   const effectiveMode = normalizeMode(mode) || DEFAULT_MODE;
@@ -85,7 +95,7 @@ function getPonytailInstructions(mode) {
 
   try {
     return 'PONYTAIL MODE ACTIVE — level: ' + effectiveMode + '\n\n' +
-      filterSkillBodyForMode(fs.readFileSync(SKILL_PATH, 'utf8'), effectiveMode);
+      filterSkillBodyForMode(readSkill(), effectiveMode);
   } catch (e) {
     return getFallbackInstructions(effectiveMode);
   }

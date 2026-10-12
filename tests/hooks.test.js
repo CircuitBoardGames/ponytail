@@ -922,4 +922,28 @@ assert.equal(
   assert.equal(fs.readFileSync(bareFlag, 'utf8'), 'full', 'an off default still switches on at full');
 }
 
+// Copied-hook installs put hooks/ in <project>/.claude/hooks/ponytail/, where the
+// sibling ../skills/ponytail/SKILL.md does not exist; the installed skill must still
+// load instead of the fallback text (CircuitBoardGames/ClaudeCode#2036).
+{
+  const copied = path.join(temp, 'copied', '.claude', 'hooks', 'ponytail');
+  fs.mkdirSync(copied, { recursive: true });
+  for (const f of ['ponytail-instructions.js', 'ponytail-config.js']) {
+    fs.copyFileSync(path.join(root, 'hooks', f), path.join(copied, f));
+  }
+  const skillAt = (dir) => {
+    fs.mkdirSync(path.join(dir, 'skills', 'ponytail'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'skills', 'ponytail', 'SKILL.md'), '---\nname: ponytail\n---\nINSTALLED SKILL BODY\n');
+    return dir;
+  };
+  const load = (env) => spawnSync(process.execPath, ['-e',
+    `const m = require(${JSON.stringify(path.join(copied, 'ponytail-instructions.js'))}); process.stdout.write(m.getPonytailInstructions('lite'))`,
+  ], { env: { ...process.env, CLAUDE_PROJECT_DIR: '', CLAUDE_CONFIG_DIR: path.join(temp, 'no-claude-dir'), ...env }, encoding: 'utf8' }).stdout;
+
+  assert.doesNotMatch(load({}), /INSTALLED SKILL BODY/, 'no installed skill: fallback');
+  assert.match(load({}), /PONYTAIL MODE ACTIVE — level: lite/);
+  assert.match(load({ CLAUDE_CONFIG_DIR: skillAt(path.join(temp, 'user-claude')) }), /INSTALLED SKILL BODY/, 'user skill (~/.claude/skills) loads');
+  assert.match(load({ CLAUDE_PROJECT_DIR: path.dirname(skillAt(path.join(temp, 'proj', '.claude'))) }), /INSTALLED SKILL BODY/, 'project skill (.claude/skills) loads');
+}
+
 console.log('hook compatibility checks passed');
