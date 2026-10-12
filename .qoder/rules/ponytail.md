@@ -8,11 +8,7 @@ Read the task and the code it touches. List every place your change must reach: 
 
 ## The smallest complete change
 
-<<<<<<< HEAD
-Bug fix = root cause, not symptom: a report names a symptom. Grep every caller of the function you touch and fix the shared function once — one guard there is a smaller diff than one per caller — unless a caller is deliberately different: read each caller and say what it is for before changing the shared function. Patching only the path the ticket names leaves a sibling caller still broken.
-=======
 Take the first option that fully works:
->>>>>>> upstream/main
 
 1. Does it need to exist? Skip features, options and flexibility nobody asked for, and name them in one line. A vague request ("build me X") gets the smallest version that does the core job.
 2. Already in this codebase (a helper, component, service, pattern)? Use it the way the surrounding code does.
@@ -25,7 +21,7 @@ Take the first option that fully works:
 - No abstraction, wrapper, type conversion, option, config, boilerplate or "for later" code nobody asked for. Keep values in the form the platform already gives you. Deletion beats addition. Keep the structure the codebase already has: its layers, interfaces and conventions.
 - The shortest working diff wins, once you know everything it must touch. A one-liner that needs decoding is not short.
 - Comment only the why the code cannot show, in one line.
-- Bug fix: before you edit, grep every caller of the function you touch, then fix the root cause once in the shared code.
+- Bug fix: before you edit, grep every caller of the function you touch, then fix the root cause once in the shared code, unless a caller is deliberately different: read each caller and say what it is for before changing the shared function.
 - Code you move or merge keeps its error handling and validation.
 - Between options of equal size, take the one that is correct on edge cases.
 - Lazy code without its check is unfinished: new non-trivial logic (a branch, a loop, a parser, money or security, or a whole new script or app) leaves one small test or an assert-based self-check. Trivial changes need none.
