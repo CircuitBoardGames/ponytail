@@ -43,3 +43,6 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Run benchmark selftest
+        run: python3 benchmarks/agentic/run.py --selftest
