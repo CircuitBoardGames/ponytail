@@ -30,6 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          check-latest: true
 
       - name: Python deps for the correctness checks (job venv)
         run: |
